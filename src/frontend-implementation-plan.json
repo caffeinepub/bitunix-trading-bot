@@ -1,0 +1,250 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Bitunix Trading Bot System - Frontend Implementation",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Create spot trading Grid bot configuration UI with price range, grid levels, and investment amount controls",
+      "acceptanceCriteria": [
+        "Users can set minimum and maximum price range for the grid",
+        "Users can specify number of grid levels (e.g., 10, 20, 50 grids)",
+        "Users can set total investment amount to distribute across grid",
+        "System calculates and displays price levels for each grid",
+        "Grid bot can be enabled/disabled by user"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/bots/GridBotConfig.tsx",
+          "operation": "create",
+          "description": "Create Grid bot configuration component with form inputs for upper/lower price bounds, number of grid levels (slider or number input), and total investment amount. Display calculated price levels for each grid position. Include enable/disable toggle and save button that calls saveBotConfig backend method with BotType.grid. Use the generated image at frontend/public/assets/generated/grid-pattern.dim_600x400.png as a background overlay for visual appeal."
+        },
+        {
+          "path": "frontend/src/components/bots/GridBotStatus.tsx",
+          "operation": "create",
+          "description": "Create Grid bot status display component showing current active orders, grid configuration summary, and profit/loss metrics. Fetch bot config via getBotConfigs and display grid parameters (bounds, levels, investment). Show active grid positions and their status."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Implement futures trading bot UI using MACD + RSI strategy with configurable parameters",
+      "acceptanceCriteria": [
+        "Bot calculates MACD (12, 26, 9) and RSI (14) indicators from price data",
+        "Buy signals trigger when MACD crosses up and RSI < 30",
+        "Sell signals trigger when MACD crosses down and RSI > 70",
+        "Users can configure leverage (1x-20x) and position size",
+        "Bot displays current indicator values and signal status"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/bots/MacdRsiBotConfig.tsx",
+          "operation": "create",
+          "description": "Create MACD+RSI bot configuration component with form inputs for timeframe selection (1m, 5m, 15m, 1h, 4h), leverage slider (1x-20x), and position size input. Include strategy description explaining buy/sell signal logic (MACD crossover + RSI thresholds). Add enable/disable toggle and save button that calls saveBotConfig with BotType.macdRsi and MacdRsiBotConfig structure."
+        },
+        {
+          "path": "frontend/src/components/bots/MacdRsiBotStatus.tsx",
+          "operation": "create",
+          "description": "Create MACD+RSI bot status display component showing current MACD line, signal line, RSI value, and latest signal status (buy/sell/neutral) with timestamp. Display current open positions and profit/loss. Use color coding (green for buy signals, red for sell signals, gray for neutral)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Implement scalping futures bot UI using EMA crossover strategy with tight stop-loss and take-profit controls",
+      "acceptanceCriteria": [
+        "Bot calculates EMA(9) and EMA(21) from price data",
+        "Buy signals trigger on upward EMA crossover",
+        "Sell signals trigger on downward EMA crossover",
+        "Users can set stop-loss percentage (e.g., 0.5%-2%)",
+        "Users can set take-profit percentage (e.g., 0.5%-3%)",
+        "Bot displays current EMA values and crossover status"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/bots/EmaScalpingBotConfig.tsx",
+          "operation": "create",
+          "description": "Create EMA scalping bot configuration component with inputs for stop-loss percentage (0.5%-2% range), take-profit percentage (0.5%-3% range), and position size. Display strategy description explaining EMA(9)/EMA(21) crossover logic. Include enable/disable toggle and save button that calls saveBotConfig with BotType.emaScalping and EmaScalpingBotConfig structure."
+        },
+        {
+          "path": "frontend/src/components/bots/EmaScalpingBotStatus.tsx",
+          "operation": "create",
+          "description": "Create EMA scalping bot status display component showing current EMA(9) and EMA(21) values, crossover status (bullish/bearish), and latest entry/exit signals with timestamps. Display active positions with stop-loss and take-profit levels. Use visual indicators for crossover direction."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Create comprehensive trading dashboard displaying real-time status for all three bots with metrics and signals",
+      "acceptanceCriteria": [
+        "Dashboard shows all three bots in separate cards or sections",
+        "Each bot displays profit/loss in both USDT amount and percentage",
+        "Real-time update of bot status and metrics",
+        "Entry/exit signals are clearly marked with timestamps",
+        "Visual indicators for active (green) and inactive (gray) bots"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Dashboard.tsx",
+          "operation": "create",
+          "description": "Create main trading dashboard page with three distinct cards/sections for Grid, MACD+RSI, and EMA Scalping bots. Each card displays bot name, type (spot/futures), active/inactive status with visual indicator (green dot for active, gray for inactive), total profit/loss in USDT and percentage (color-coded: cyan for profit, red for loss), number of completed trades from trading history, current open positions count, and latest entry/exit signals with timestamps. Use gradient cards with the generated image at frontend/public/assets/generated/bot-icon.dim_128x128.png for bot icons. Fetch data via getBotConfigs and getTradingHistory backend methods. Include refresh button for manual data updates. Wire this page to the main App router at /dashboard route."
+        },
+        {
+          "path": "frontend/src/components/dashboard/BotCard.tsx",
+          "operation": "create",
+          "description": "Create reusable bot card component that accepts bot configuration, trading history, and status as props. Display bot name, type badge (spot/futures), status indicator with animation, profit/loss metrics with color coding (cyan for positive, red for negative), completed trades count, open positions, and latest signal with timestamp. Include quick action buttons (view details, toggle on/off). Use gradient backgrounds and smooth transitions for status changes."
+        },
+        {
+          "path": "frontend/src/hooks/useBotMetrics.ts",
+          "operation": "create",
+          "description": "Create custom hook that fetches and calculates bot metrics from backend. Call getBotConfigs to get all bot configurations and getTradingHistory to get trade records. Calculate profit/loss totals in USDT and percentage for each bot by summing trade results. Return aggregated metrics including active status, profit/loss, trade count, and latest signals. Use React Query for caching and automatic refetching."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Implement manual trading interface and mode toggle for each bot to switch between automated and manual execution",
+      "acceptanceCriteria": [
+        "Manual trading interface for spot orders (buy/sell, price, amount)",
+        "Manual trading interface for futures orders (long/short, leverage, amount)",
+        "Each bot has an enable/disable toggle switch",
+        "When bot is disabled, automated trading stops but manual trading remains available",
+        "Clear visual indication of manual vs automated mode"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/trading/ManualTradeForm.tsx",
+          "operation": "create",
+          "description": "Create manual trading form component supporting both spot and futures orders. For spot: symbol input, buy/sell radio buttons, price input, amount input. For futures: symbol input, long/short radio buttons, leverage slider, amount input. Include order type selector (market/limit). Submit button calls placeOrder backend method with OrderRequest structure. Display order confirmation and error handling. Add clear visual distinction from automated mode (border color or badge)."
+        },
+        {
+          "path": "frontend/src/components/bots/BotModeToggle.tsx",
+          "operation": "create",
+          "description": "Create bot mode toggle component with switch control to toggle between automated and manual modes. Display current mode with clear label (Automated/Manual) and icon. When mode changes, call updateBotConfig backend method to update BotMode enum value. Use animated transition for mode switch. Include tooltip explaining mode differences. Show status indicator (green for automated active, blue for manual mode)."
+        },
+        {
+          "path": "frontend/src/pages/ManualTrading.tsx",
+          "operation": "create",
+          "description": "Create manual trading page containing ManualTradeForm component for spot and futures trading sections. Display current account balance via getBalance backend method. Show recent manual trades from trading history filtered by manual execution. Include order book preview and current market data display. Wire this page to the main App router at /manual-trading route and add navigation link in the app header."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Create Bitunix API credentials settings page with secure input and connection testing",
+      "acceptanceCriteria": [
+        "Settings page with secure input fields for API key and secret",
+        "API credentials are encrypted and stored in backend",
+        "Test connection button to verify API credentials",
+        "Error handling for invalid or expired API keys",
+        "All trading operations use authenticated API calls to Bitunix"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Settings.tsx",
+          "operation": "create",
+          "description": "Create settings page with secure form for Bitunix API credentials. Include password-type input fields for API key and API secret with show/hide toggle icons. Add 'Save Credentials' button that calls saveApiCredentials backend method. Include 'Test Connection' button that calls hasApiCredentials and attempts to fetch balance via getBalance to verify credentials work. Display connection status with visual feedback (green checkmark for success, red X for failure). Show error messages for invalid or expired keys. Add 'Delete Credentials' button that calls deleteApiCredentials. Check credential status on page load via hasApiCredentials. Wire this page to the main App router at /settings route and add navigation link in the app header."
+        },
+        {
+          "path": "frontend/src/hooks/useApiCredentials.ts",
+          "operation": "create",
+          "description": "Create custom hook for managing API credentials state. Provide methods to save, test, and delete credentials using backend methods (saveApiCredentials, hasApiCredentials, deleteApiCredentials). Use React Query for credential status caching. Return loading states, error handling, and success callbacks. Include credential validation before allowing trading operations."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Implement risk management controls UI for all bots with configurable limits and dashboard metrics display",
+      "acceptanceCriteria": [
+        "Each bot has individual stop-loss and take-profit settings",
+        "Users can set maximum position size per trade",
+        "Users can set daily maximum loss limit",
+        "Bots automatically close positions when stop-loss or take-profit triggers",
+        "Dashboard shows current risk exposure and remaining daily limits"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/bots/RiskManagementForm.tsx",
+          "operation": "create",
+          "description": "Create risk management configuration form component with inputs for stop-loss percentage, take-profit percentage, maximum position size, and daily loss limit. Use slider inputs with numeric displays for percentages. Include validation to ensure values are within reasonable ranges. Save button calls saveBotConfig or updateBotConfig with RiskManagement structure. Display current risk settings summary. This component should be included in each bot configuration page (GridBotConfig, MacdRsiBotConfig, EmaScalpingBotConfig)."
+        },
+        {
+          "path": "frontend/src/components/dashboard/RiskMetricsPanel.tsx",
+          "operation": "create",
+          "description": "Create risk metrics display panel showing current risk exposure across all bots. Display total open position sizes, current daily loss/profit, remaining daily loss limit (progress bar), and number of stop-loss/take-profit triggers today. Calculate metrics from trading history via getTradingHistory. Use color-coded indicators (red for approaching limits, green for safe, yellow for warning). Include in the Dashboard page as a summary section above bot cards."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Integrate Internet Identity authentication with user profile setup and principal-based data access",
+      "acceptanceCriteria": [
+        "Login page with Internet Identity button",
+        "Unauthenticated users cannot access trading features",
+        "User settings and bot configurations are stored per principal",
+        "Logout functionality that clears session",
+        "Dashboard displays authenticated user's principal (truncated)"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/auth/LoginButton.tsx",
+          "operation": "create",
+          "description": "Use the authorization component to create login/logout button. Follow the component's usage instructions for proper Internet Identity integration. Handle login state transitions, display loading state during authentication, and clear query cache on logout. Show 'Login' for unauthenticated users and 'Logout' for authenticated users. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/auth/ProfileSetupModal.tsx",
+          "operation": "create",
+          "description": "Use the authorization component to create profile setup modal. Follow the component's usage instructions to check for existing profile via getCallerUserProfile and prompt for name input if profile is null. Call saveCallerUserProfile to save the profile. Implement proper loading state handling to prevent modal flash as described in the authorization component usage. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/auth/ProtectedRoute.tsx",
+          "operation": "create",
+          "description": "Use the authorization component to create protected route wrapper. Follow the component's usage instructions to check authentication status before rendering child components. Redirect unauthenticated users to login page. Show loading spinner while checking authentication. Wrap Dashboard, ManualTrading, and Settings pages with this component. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/layout/Header.tsx",
+          "operation": "create",
+          "description": "Create application header component with app logo/title, navigation links (Dashboard, Manual Trading, Settings), and LoginButton component. For authenticated users, display truncated principal or user profile name from getCallerUserProfile. Use dark theme styling with neon cyan accents. Include the generated image at frontend/public/assets/generated/trading-hero.dim_1200x400.png as a hero banner on the login page (not in header). Position header at top of all pages."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Modify main App component to set up routing with react-router-dom. Add routes for /dashboard (Dashboard page wrapped in ProtectedRoute), /manual-trading (ManualTrading page wrapped in ProtectedRoute), /settings (Settings page wrapped in ProtectedRoute), and / (login/landing page showing LoginButton and hero image). Include Header component on all routes. Set up Internet Identity provider and React Query client wrapper. Add ProfileSetupModal that appears after successful login if user profile is null."
+        },
+        {
+          "path": "frontend/src/hooks/useUserProfile.ts",
+          "operation": "create",
+          "description": "Use the authorization component to create user profile hook. Follow the component's usage instructions for proper profile fetching with getCallerUserProfile and saving with saveCallerUserProfile. Implement proper loading state handling as shown in the component's preventing modal flash example. Return profile data, loading states, and mutation methods. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "summary": "Design sophisticated dark theme trading interface with neon accents, animated charts, and gradient cards",
+      "acceptanceCriteria": [
+        "Dark theme with professional trading aesthetic",
+        "Color-coded profit/loss indicators (green for profit, red for loss)",
+        "Smooth animations and transitions throughout UI",
+        "Clear visual hierarchy separating bots and their metrics",
+        "Responsive layout that works on desktop and tablet"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Modify global styles to implement dark theme with deep charcoal backgrounds (#0a0e14, #141922), neon cyan accents (#00d9ff) for positive values, neon red (#ff3366) for negative values, and crisp white text (#ffffff). Define CSS custom properties for theme colors. Add smooth transition rules for all interactive elements (0.3s ease). Include gradient definitions for bot cards (dark charcoal to slightly lighter charcoal with subtle cyan glow). Add animation keyframes for status indicators (pulse for active, fade for inactive). Define responsive breakpoints for desktop and tablet layouts."
+        },
+        {
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Extend Tailwind config to include custom trading theme colors: charcoal backgrounds (charcoal-dark, charcoal-light), neon accents (neon-cyan, neon-red, neon-green), and custom gradient stops. Add custom animation utilities for pulse, fade, and slide transitions. Define spacing scale optimized for trading dashboard layout. Configure responsive breakpoints for desktop (1280px) and tablet (768px). Add custom shadow utilities for glowing effects on active elements."
+        },
+        {
+          "path": "frontend/src/components/ui/AnimatedCard.tsx",
+          "operation": "create",
+          "description": "Create reusable animated card component with gradient background, smooth hover transitions, and optional glow effect. Accept props for gradient direction, glow color, and animation type. Use framer-motion for smooth entrance animations (fade-in, slide-up). Apply dark charcoal base with subtle gradient overlay. Include optional status indicator dot with pulse animation. This component will be used by BotCard and other dashboard elements."
+        }
+      ]
+    }
+  ]
+}

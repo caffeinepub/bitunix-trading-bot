@@ -1,2 +1,3 @@
-# bitunix-trading-bot
-Exported from Caffeine project: Bitunix Trading Bot
+## Bitunix Trading Bot
+
+To run app build and run docker image: `docker build -t app . docker run -it --network host app`
