@@ -62,10 +62,15 @@ export interface TradeRecord {
   'amount' : number,
   'symbol' : string,
 }
+export interface UpdateUserProfile {
+  'username' : string,
+  'email' : string,
+  'createdAtNanos' : bigint,
+}
 export interface UserProfile {
-  'name' : string,
-  'createdAt' : bigint,
-  'email' : [] | [string],
+  'username' : string,
+  'email' : string,
+  'createdAtNanos' : bigint,
 }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
@@ -86,6 +91,7 @@ export interface _SERVICE {
     Array<[Principal, Array<BotConfig>]>
   >,
   'getAllUsers' : ActorMethod<[], Array<Principal>>,
+  'getApiBotStatus' : ActorMethod<[], Array<[string, boolean]>>,
   'getBalance' : ActorMethod<[], number>,
   'getBotConfigs' : ActorMethod<[], Array<BotConfig>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
@@ -96,10 +102,16 @@ export interface _SERVICE {
   'hasApiCredentials' : ActorMethod<[], boolean>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'placeOrder' : ActorMethod<[OrderRequest], string>,
-  'saveApiCredentials' : ActorMethod<[string, string], undefined>,
+  'refreshApiCredentialsValidation' : ActorMethod<[], boolean>,
+  'saveApiCredentials' : ActorMethod<
+    [string, string, Array<BotType>],
+    undefined
+  >,
   'saveBotConfig' : ActorMethod<[BotConfig], undefined>,
-  'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'saveCallerUserProfile' : ActorMethod<[UpdateUserProfile], undefined>,
+  'updateApiBotTypes' : ActorMethod<[Array<BotType>], undefined>,
   'updateBotConfig' : ActorMethod<[bigint, BotConfig], undefined>,
+  'verifyApiCredentials' : ActorMethod<[], boolean>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

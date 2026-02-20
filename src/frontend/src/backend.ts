@@ -114,11 +114,10 @@ export interface EmaScalpingBotConfig {
     ema21Period: bigint;
     stopLossPercent: number;
 }
-export interface GridBotConfig {
-    investmentPerGrid: number;
-    lowerBound: number;
-    upperBound: number;
-    gridLevels: bigint;
+export interface UpdateUserProfile {
+    username: string;
+    email: string;
+    createdAtNanos: bigint;
 }
 export interface TradeRecord {
     tradeType: string;
@@ -130,10 +129,16 @@ export interface TradeRecord {
     amount: number;
     symbol: string;
 }
+export interface GridBotConfig {
+    investmentPerGrid: number;
+    lowerBound: number;
+    upperBound: number;
+    gridLevels: bigint;
+}
 export interface UserProfile {
-    name: string;
-    createdAt: bigint;
-    email?: string;
+    username: string;
+    email: string;
+    createdAtNanos: bigint;
 }
 export interface OrderRequest {
     orderType: string;
@@ -165,6 +170,7 @@ export interface backendInterface {
     getAllTradingHistory(): Promise<Array<[Principal, Array<TradeRecord>]>>;
     getAllUserBotConfigs(): Promise<Array<[Principal, Array<BotConfig>]>>;
     getAllUsers(): Promise<Array<Principal>>;
+    getApiBotStatus(): Promise<Array<[string, boolean]>>;
     getBalance(): Promise<number>;
     getBotConfigs(): Promise<Array<BotConfig>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
@@ -175,10 +181,13 @@ export interface backendInterface {
     hasApiCredentials(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     placeOrder(request: OrderRequest): Promise<string>;
-    saveApiCredentials(apiKey: string, apiSecret: string): Promise<void>;
+    refreshApiCredentialsValidation(): Promise<boolean>;
+    saveApiCredentials(apiKey: string, apiSecret: string, enabledBotTypes: Array<BotType>): Promise<void>;
     saveBotConfig(config: BotConfig): Promise<void>;
-    saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    saveCallerUserProfile(profile: UpdateUserProfile): Promise<void>;
+    updateApiBotTypes(botTypesToEnable: Array<BotType>): Promise<void>;
     updateBotConfig(index: bigint, config: BotConfig): Promise<void>;
+    verifyApiCredentials(): Promise<boolean>;
 }
 import type { BotConfig as _BotConfig, BotMode as _BotMode, BotType as _BotType, EmaScalpingBotConfig as _EmaScalpingBotConfig, GridBotConfig as _GridBotConfig, MacdRsiBotConfig as _MacdRsiBotConfig, RiskManagement as _RiskManagement, TradeRecord as _TradeRecord, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -309,6 +318,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getApiBotStatus(): Promise<Array<[string, boolean]>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getApiBotStatus();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getApiBotStatus();
+            return result;
+        }
+    }
     async getBalance(): Promise<number> {
         if (this.processError) {
             try {
@@ -355,14 +378,14 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserRole();
-                return from_candid_UserRole_n25(this._uploadFile, this._downloadFile, result);
+                return from_candid_UserRole_n22(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserRole();
-            return from_candid_UserRole_n25(this._uploadFile, this._downloadFile, result);
+            return from_candid_UserRole_n22(this._uploadFile, this._downloadFile, result);
         }
     }
     async getTradingHistory(): Promise<Array<TradeRecord>> {
@@ -449,17 +472,31 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async saveApiCredentials(arg0: string, arg1: string): Promise<void> {
+    async refreshApiCredentialsValidation(): Promise<boolean> {
         if (this.processError) {
             try {
-                const result = await this.actor.saveApiCredentials(arg0, arg1);
+                const result = await this.actor.refreshApiCredentialsValidation();
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.saveApiCredentials(arg0, arg1);
+            const result = await this.actor.refreshApiCredentialsValidation();
+            return result;
+        }
+    }
+    async saveApiCredentials(arg0: string, arg1: string, arg2: Array<BotType>): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.saveApiCredentials(arg0, arg1, to_candid_vec_n24(this._uploadFile, this._downloadFile, arg2));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.saveApiCredentials(arg0, arg1, to_candid_vec_n24(this._uploadFile, this._downloadFile, arg2));
             return result;
         }
     }
@@ -477,17 +514,31 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async saveCallerUserProfile(arg0: UserProfile): Promise<void> {
+    async saveCallerUserProfile(arg0: UpdateUserProfile): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n33(this._uploadFile, this._downloadFile, arg0));
+                const result = await this.actor.saveCallerUserProfile(arg0);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n33(this._uploadFile, this._downloadFile, arg0));
+            const result = await this.actor.saveCallerUserProfile(arg0);
+            return result;
+        }
+    }
+    async updateApiBotTypes(arg0: Array<BotType>): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateApiBotTypes(to_candid_vec_n24(this._uploadFile, this._downloadFile, arg0));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateApiBotTypes(to_candid_vec_n24(this._uploadFile, this._downloadFile, arg0));
             return result;
         }
     }
@@ -505,6 +556,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async verifyApiCredentials(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.verifyApiCredentials();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.verifyApiCredentials();
+            return result;
+        }
+    }
 }
 function from_candid_BotConfig_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _BotConfig): BotConfig {
     return from_candid_record_n15(_uploadFile, _downloadFile, value);
@@ -518,11 +583,8 @@ function from_candid_BotType_n9(_uploadFile: (file: ExternalBlob) => Promise<Uin
 function from_candid_TradeRecord_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _TradeRecord): TradeRecord {
     return from_candid_record_n7(_uploadFile, _downloadFile, value);
 }
-function from_candid_UserProfile_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserProfile): UserProfile {
-    return from_candid_record_n23(_uploadFile, _downloadFile, value);
-}
-function from_candid_UserRole_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
-    return from_candid_variant_n26(_uploadFile, _downloadFile, value);
+function from_candid_UserRole_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
+    return from_candid_variant_n23(_uploadFile, _downloadFile, value);
 }
 function from_candid_opt_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_EmaScalpingBotConfig]): EmaScalpingBotConfig | null {
     return value.length === 0 ? null : value[0];
@@ -534,9 +596,6 @@ function from_candid_opt_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
     return value.length === 0 ? null : value[0];
 }
 function from_candid_opt_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
-    return value.length === 0 ? null : from_candid_UserProfile_n22(_uploadFile, _downloadFile, value[0]);
-}
-function from_candid_opt_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
     return value.length === 0 ? null : value[0];
 }
 function from_candid_opt_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_BotType]): BotType | null {
@@ -564,21 +623,6 @@ function from_candid_record_n15(_uploadFile: (file: ExternalBlob) => Promise<Uin
         riskManagement: value.riskManagement,
         macdRsiConfig: record_opt_to_undefined(from_candid_opt_n19(_uploadFile, _downloadFile, value.macdRsiConfig)),
         gridConfig: record_opt_to_undefined(from_candid_opt_n20(_uploadFile, _downloadFile, value.gridConfig))
-    };
-}
-function from_candid_record_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
-    name: string;
-    createdAt: bigint;
-    email: [] | [string];
-}): {
-    name: string;
-    createdAt: bigint;
-    email?: string;
-} {
-    return {
-        name: value.name,
-        createdAt: value.createdAt,
-        email: record_opt_to_undefined(from_candid_opt_n24(_uploadFile, _downloadFile, value.email))
     };
 }
 function from_candid_record_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
@@ -639,7 +683,7 @@ function from_candid_variant_n18(_uploadFile: (file: ExternalBlob) => Promise<Ui
 }): BotMode {
     return "automated" in value ? BotMode.automated : "manual" in value ? BotMode.manual : value;
 }
-function from_candid_variant_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_variant_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     admin: null;
 } | {
     user: null;
@@ -666,11 +710,8 @@ function to_candid_BotConfig_n27(_uploadFile: (file: ExternalBlob) => Promise<Ui
 function to_candid_BotMode_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BotMode): _BotMode {
     return to_candid_variant_n30(_uploadFile, _downloadFile, value);
 }
-function to_candid_BotType_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BotType): _BotType {
-    return to_candid_variant_n32(_uploadFile, _downloadFile, value);
-}
-function to_candid_UserProfile_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserProfile): _UserProfile {
-    return to_candid_record_n34(_uploadFile, _downloadFile, value);
+function to_candid_BotType_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BotType): _BotType {
+    return to_candid_variant_n26(_uploadFile, _downloadFile, value);
 }
 function to_candid_UserRole_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
     return to_candid_variant_n2(_uploadFile, _downloadFile, value);
@@ -693,25 +734,10 @@ function to_candid_record_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8
     return {
         emaScalpingConfig: value.emaScalpingConfig ? candid_some(value.emaScalpingConfig) : candid_none(),
         mode: to_candid_BotMode_n29(_uploadFile, _downloadFile, value.mode),
-        botType: to_candid_BotType_n31(_uploadFile, _downloadFile, value.botType),
+        botType: to_candid_BotType_n25(_uploadFile, _downloadFile, value.botType),
         riskManagement: value.riskManagement,
         macdRsiConfig: value.macdRsiConfig ? candid_some(value.macdRsiConfig) : candid_none(),
         gridConfig: value.gridConfig ? candid_some(value.gridConfig) : candid_none()
-    };
-}
-function to_candid_record_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
-    name: string;
-    createdAt: bigint;
-    email?: string;
-}): {
-    name: string;
-    createdAt: bigint;
-    email: [] | [string];
-} {
-    return {
-        name: value.name,
-        createdAt: value.createdAt,
-        email: value.email ? candid_some(value.email) : candid_none()
     };
 }
 function to_candid_variant_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
@@ -729,18 +755,7 @@ function to_candid_variant_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8
         guest: null
     } : value;
 }
-function to_candid_variant_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BotMode): {
-    automated: null;
-} | {
-    manual: null;
-} {
-    return value == BotMode.automated ? {
-        automated: null
-    } : value == BotMode.manual ? {
-        manual: null
-    } : value;
-}
-function to_candid_variant_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BotType): {
+function to_candid_variant_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BotType): {
     grid: null;
 } | {
     emaScalping: null;
@@ -754,6 +769,20 @@ function to_candid_variant_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint
     } : value == BotType.macdRsi ? {
         macdRsi: null
     } : value;
+}
+function to_candid_variant_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BotMode): {
+    automated: null;
+} | {
+    manual: null;
+} {
+    return value == BotMode.automated ? {
+        automated: null
+    } : value == BotMode.manual ? {
+        manual: null
+    } : value;
+}
+function to_candid_vec_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<BotType>): Array<_BotType> {
+    return value.map((x)=>to_candid_BotType_n25(_uploadFile, _downloadFile, x));
 }
 export interface CreateActorOptions {
     agent?: Agent;

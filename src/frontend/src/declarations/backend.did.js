@@ -64,15 +64,20 @@ export const BotConfig = IDL.Record({
   'gridConfig' : IDL.Opt(GridBotConfig),
 });
 export const UserProfile = IDL.Record({
-  'name' : IDL.Text,
-  'createdAt' : IDL.Int,
-  'email' : IDL.Opt(IDL.Text),
+  'username' : IDL.Text,
+  'email' : IDL.Text,
+  'createdAtNanos' : IDL.Int,
 });
 export const OrderRequest = IDL.Record({
   'orderType' : IDL.Text,
   'price' : IDL.Float64,
   'amount' : IDL.Float64,
   'symbol' : IDL.Text,
+});
+export const UpdateUserProfile = IDL.Record({
+  'username' : IDL.Text,
+  'email' : IDL.Text,
+  'createdAtNanos' : IDL.Int,
 });
 
 export const idlService = IDL.Service({
@@ -93,6 +98,11 @@ export const idlService = IDL.Service({
       ['query'],
     ),
   'getAllUsers' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
+  'getApiBotStatus' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Tuple(IDL.Text, IDL.Bool))],
+      ['query'],
+    ),
   'getBalance' : IDL.Func([], [IDL.Float64], []),
   'getBotConfigs' : IDL.Func([], [IDL.Vec(BotConfig)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
@@ -111,10 +121,17 @@ export const idlService = IDL.Service({
   'hasApiCredentials' : IDL.Func([], [IDL.Bool], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'placeOrder' : IDL.Func([OrderRequest], [IDL.Text], []),
-  'saveApiCredentials' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'refreshApiCredentialsValidation' : IDL.Func([], [IDL.Bool], []),
+  'saveApiCredentials' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Vec(BotType)],
+      [],
+      [],
+    ),
   'saveBotConfig' : IDL.Func([BotConfig], [], []),
-  'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'saveCallerUserProfile' : IDL.Func([UpdateUserProfile], [], []),
+  'updateApiBotTypes' : IDL.Func([IDL.Vec(BotType)], [], []),
   'updateBotConfig' : IDL.Func([IDL.Nat, BotConfig], [], []),
+  'verifyApiCredentials' : IDL.Func([], [IDL.Bool], ['query']),
 });
 
 export const idlInitArgs = [];
@@ -173,15 +190,20 @@ export const idlFactory = ({ IDL }) => {
     'gridConfig' : IDL.Opt(GridBotConfig),
   });
   const UserProfile = IDL.Record({
-    'name' : IDL.Text,
-    'createdAt' : IDL.Int,
-    'email' : IDL.Opt(IDL.Text),
+    'username' : IDL.Text,
+    'email' : IDL.Text,
+    'createdAtNanos' : IDL.Int,
   });
   const OrderRequest = IDL.Record({
     'orderType' : IDL.Text,
     'price' : IDL.Float64,
     'amount' : IDL.Float64,
     'symbol' : IDL.Text,
+  });
+  const UpdateUserProfile = IDL.Record({
+    'username' : IDL.Text,
+    'email' : IDL.Text,
+    'createdAtNanos' : IDL.Int,
   });
   
   return IDL.Service({
@@ -202,6 +224,11 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getAllUsers' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
+    'getApiBotStatus' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Tuple(IDL.Text, IDL.Bool))],
+        ['query'],
+      ),
     'getBalance' : IDL.Func([], [IDL.Float64], []),
     'getBotConfigs' : IDL.Func([], [IDL.Vec(BotConfig)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
@@ -220,10 +247,17 @@ export const idlFactory = ({ IDL }) => {
     'hasApiCredentials' : IDL.Func([], [IDL.Bool], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'placeOrder' : IDL.Func([OrderRequest], [IDL.Text], []),
-    'saveApiCredentials' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'refreshApiCredentialsValidation' : IDL.Func([], [IDL.Bool], []),
+    'saveApiCredentials' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Vec(BotType)],
+        [],
+        [],
+      ),
     'saveBotConfig' : IDL.Func([BotConfig], [], []),
-    'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'saveCallerUserProfile' : IDL.Func([UpdateUserProfile], [], []),
+    'updateApiBotTypes' : IDL.Func([IDL.Vec(BotType)], [], []),
     'updateBotConfig' : IDL.Func([IDL.Nat, BotConfig], [], []),
+    'verifyApiCredentials' : IDL.Func([], [IDL.Bool], ['query']),
   });
 };
 

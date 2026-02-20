@@ -18,10 +18,15 @@ export interface BotMetrics {
 }
 
 export function useBotMetrics() {
-  const { data: botConfigs = [], isLoading: configsLoading } = useGetBotConfigs();
-  const { data: tradingHistory = [], isLoading: historyLoading } = useGetTradingHistory();
+  const { data: botConfigs, isLoading: configsLoading, isFetched: configsFetched } = useGetBotConfigs();
+  const { data: tradingHistory, isLoading: historyLoading, isFetched: historyFetched } = useGetTradingHistory();
 
   const metrics = useMemo(() => {
+    // Only calculate metrics when both queries have completed and data is available
+    if (!configsFetched || !historyFetched || !botConfigs || !tradingHistory) {
+      return [];
+    }
+
     return botConfigs.map((config): BotMetrics => {
       const botTrades = tradingHistory.filter(
         (trade) => trade.botType && trade.botType === config.botType
@@ -59,10 +64,11 @@ export function useBotMetrics() {
           : undefined,
       };
     });
-  }, [botConfigs, tradingHistory]);
+  }, [botConfigs, tradingHistory, configsFetched, historyFetched]);
 
   return {
     metrics,
     isLoading: configsLoading || historyLoading,
+    isFetched: configsFetched && historyFetched,
   };
 }

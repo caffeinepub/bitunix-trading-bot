@@ -7,7 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import Footer from '../components/layout/Footer';
 
 export default function Dashboard() {
-  const { metrics, isLoading } = useBotMetrics();
+  const { metrics, isLoading, isFetched } = useBotMetrics();
   const queryClient = useQueryClient();
 
   const handleRefresh = () => {
@@ -15,7 +15,8 @@ export default function Dashboard() {
     queryClient.invalidateQueries({ queryKey: ['tradingHistory'] });
   };
 
-  if (isLoading) {
+  // Show loading state until data is fully fetched
+  if (isLoading || !isFetched) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
@@ -50,7 +51,9 @@ export default function Dashboard() {
             </p>
           </div>
         ) : (
-          metrics.map((metric, index) => <BotCard key={index} metric={metric} index={index} />)
+          metrics.map((metric, index) => (
+            <BotCard key={`${metric.botType}-${index}`} metric={metric} index={index} />
+          ))
         )}
       </div>
 

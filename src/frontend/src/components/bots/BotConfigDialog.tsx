@@ -25,12 +25,12 @@ export default function BotConfigDialog({ open, onOpenChange, config, index }: B
             <TabsTrigger value="strategy">Strategy</TabsTrigger>
             <TabsTrigger value="risk">Risk Management</TabsTrigger>
           </TabsList>
-          <TabsContent value="strategy" className="space-y-4">
+          <TabsContent value="strategy" className="space-y-4 mt-4">
             {config.botType === 'grid' && <GridBotConfig config={config} index={index} />}
             {config.botType === 'macdRsi' && <MacdRsiBotConfig config={config} index={index} />}
             {config.botType === 'emaScalping' && <EmaScalpingBotConfig config={config} index={index} />}
           </TabsContent>
-          <TabsContent value="risk" className="space-y-4">
+          <TabsContent value="risk" className="space-y-4 mt-4">
             <RiskManagementForm config={config} index={index} />
           </TabsContent>
         </Tabs>

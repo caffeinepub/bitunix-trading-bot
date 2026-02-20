@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 3,
+  "projectStateVersion": 7,
   "summary": "Trading bot application for Bitunix exchange with 1 spot grid bot and 2 futures bots using MACD/RSI and EMA scalping strategies",
   "architectural_notes": [
     "Trading bot system connecting to Bitunix exchange API",
@@ -10,10 +10,12 @@
     "Internet Identity for authentication"
   ],
   "known_issues": [
-    "User needs to obtain Bitunix API keys before live trading can function"
+    "User needs to obtain Bitunix API keys before live trading can function",
+    "React rendering error: 'Failed to execute insertBefore on Node' occurs during app load - needs component structure optimization",
+    "Application crashes with 'خطای برنامه رخ داد' error when saving Bitunix API keys in Settings page",
+    "Black screen with 'به مشکلی پیش اومد!' message appears after API key validation attempt"
   ],
-  "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Abstract trading chart visualization with neon cyan lines on dark background (trading-hero.dim_1200x400.png)\n- Minimalist robot icon in neon cyan representing trading bot (bot-icon.dim_128x128.png)\n- Grid pattern overlay for spot trading bot card background (grid-pattern.dim_600x400.png)",
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-create-a-spot-trading-grid-bot-that-allows-users-to-configure-price-range-upper-lower-bounds-number-of-grid-levels-and-investment-amount-per-grid-the-bot-should-calculate-optimal-buy-sell-orders-across-the-grid-and-display-current-active-orders",
@@ -86,6 +88,70 @@
         "REQ-9"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-fix-the-failed-to-execute-insertbefore-on-node-react-rendering-error-that-occurs-during-application-load-by-optimizing-component-structure-ensuring-proper-key-props-in-all-list-renderings-correcting-state-management-during-loading-phases-and-validating-internet-identity-integration-code",
+      "title": "Fix the 'Failed to execute insertBefore on Node' React rendering error that occurs during application load by optimizing component structure, ensuring proper key props in all list renderings, correcting state management during loading phases, and validating Internet Identity integration code",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-review-and-stabilize-the-rendering-lifecycle-of-dashboard-components-including-botcard-riskmetricspanel-and-any-conditional-rendering-logic-to-prevent-dom-node-insertion-conflicts",
+      "title": "Review and stabilize the rendering lifecycle of dashboard components including BotCard, RiskMetricsPanel, and any conditional rendering logic to prevent DOM node insertion conflicts",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-all-react-query-data-fetching-hooks-handle-loading-and-error-states-properly-to-avoid-premature-component-mounting-that-could-cause-insertbefore-errors",
+      "title": "Ensure all React Query data fetching hooks handle loading and error states properly to avoid premature component mounting that could cause insertBefore errors",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-application-crash-that-occurs-when-users-save-bitunix-api-credentials-in-the-settings-page-the-error-application-error-occurred-appears-immediately-after-clicking-save-followed-by-a-black-screen-with-a-problem-occurred-implement-proper-error-handling-and-validation-to-prevent-crashes-during-api-credential-storage",
+      "title": "Fix the application crash that occurs when users save Bitunix API credentials in the Settings page. The error 'خطای برنامه رخ داد' (Application error occurred) appears immediately after clicking Save, followed by a black screen with 'به مشکلی پیش اومد!' (A problem occurred). Implement proper error handling and validation to prevent crashes during API credential storage.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-comprehensive-error-handling-for-api-credential-validation-that-catches-all-exceptions-during-the-save-operation-display-user-friendly-error-messages-in-persian-explaining-what-went-wrong-e-g-invalid-credentials-format-network-timeout-server-error-instead-of-crashing-the-application",
+      "title": "Add comprehensive error handling for API credential validation that catches all exceptions during the save operation. Display user-friendly error messages in Persian explaining what went wrong (e.g., invalid credentials format, network timeout, server error) instead of crashing the application.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-api-credential-validation-before-saving-to-backend-test-the-connection-to-bitunix-api-using-the-provided-credentials-and-verify-that-trading-permissions-are-enabled-before-storing-them-display-validation-status-to-users",
+      "title": "Implement API credential validation before saving to backend. Test the connection to Bitunix API using the provided credentials and verify that trading permissions are enabled before storing them. Display validation status to users.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-loading-states-and-proper-async-handling-throughout-the-settings-page-credential-save-flow-prevent-users-from-navigating-away-or-submitting-multiple-times-during-the-save-operation",
+      "title": "Add loading states and proper async handling throughout the Settings page credential save flow. Prevent users from navigating away or submitting multiple times during the save operation.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-success-notification-in-persian-that-displays-when-api-credentials-are-successfully-saved-and-validated-include-a-test-connection-button-that-users-can-click-to-verify-their-credentials-are-working-correctly",
+      "title": "Add a success notification in Persian that displays when API credentials are successfully saved and validated. Include a 'Test Connection' button that users can click to verify their credentials are working correctly.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -135,6 +201,14 @@
       "id": "AR-8",
       "summary": "Internet Identity authentication for security",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Review and fix the backend credential storage mechanism to ensure it properly handles API key and secret storage without throwing exceptions. Add validation to ensure credentials are properly formatted before attempting to store them.",
+      "reqIds": [
+        "REQ-17"
+      ],
       "status": "pending"
     }
   ],

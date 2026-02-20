@@ -2,114 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-create-a-spot-trading-grid-bot-that-allows-users-to-configure-price-range-upper-lower-bounds-number-of-grid-levels-and-investment-amount-per-grid-the-bot-should-calculate-optimal-buy-sell-orders-across-the-grid-and-display-current-active-orders",
-      "featureTitle": "Create a spot trading Grid bot that allows users to configure price range (upper/lower bounds), number of grid levels, and investment amount per grid. The bot should calculate optimal buy/sell orders across the grid and display current active orders.",
+      "featureId": "feature-fix-the-application-crash-that-occurs-when-users-save-bitunix-api-credentials-in-the-settings-page-the-error-application-error-occurred-appears-immediately-after-clicking-save-followed-by-a-black-screen-with-a-problem-occurred-implement-proper-error-handling-and-validation-to-prevent-crashes-during-api-credential-storage",
+      "featureTitle": "Fix the application crash that occurs when users save Bitunix API credentials in the Settings page. The error 'خطای برنامه رخ داد' (Application error occurred) appears immediately after clicking Save, followed by a black screen with 'به مشکلی پیش اومد!' (A problem occurred). Implement proper error handling and validation to prevent crashes during API credential storage.",
       "files": [
-        "frontend/src/components/bots/GridBotConfig.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "http-outcalls@3.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-a-futures-trading-bot-using-macd-rsi-strategy-generate-buy-signal-when-macd-line-crosses-above-signal-line-and-rsi-is-below-30-generate-sell-signal-when-macd-line-crosses-below-signal-line-and-rsi-is-above-70-allow-users-to-configure-timeframe-leverage-and-position-size",
-      "featureTitle": "Implement a futures trading bot using MACD + RSI strategy: generate buy signal when MACD line crosses above signal line AND RSI is below 30; generate sell signal when MACD line crosses below signal line AND RSI is above 70. Allow users to configure timeframe, leverage, and position size.",
-      "files": [
-        "frontend/src/components/bots/MacdRsiBotConfig.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "http-outcalls@3.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-a-scalping-futures-trading-bot-using-ema-crossover-strategy-generate-buy-signal-when-ema-9-crosses-above-ema-21-generate-sell-signal-when-ema-9-crosses-below-ema-21-include-configurable-tight-stop-loss-and-take-profit-percentages-suitable-for-quick-trades",
-      "featureTitle": "Implement a scalping futures trading bot using EMA crossover strategy: generate buy signal when EMA(9) crosses above EMA(21); generate sell signal when EMA(9) crosses below EMA(21). Include configurable tight stop-loss and take-profit percentages suitable for quick trades.",
-      "files": [
-        "frontend/src/components/bots/EmaScalpingBotConfig.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "http-outcalls@3.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-a-comprehensive-dashboard-that-displays-real-time-status-for-all-three-bots-including-bot-name-and-type-spot-futures-current-strategy-active-inactive-status-total-profit-loss-in-usdt-and-percentage-number-of-completed-trades-current-open-positions-and-latest-entry-exit-signals-with-timestamps",
-      "featureTitle": "Create a comprehensive dashboard that displays real-time status for all three bots including: bot name and type (spot/futures), current strategy, active/inactive status, total profit/loss in USDT and percentage, number of completed trades, current open positions, and latest entry/exit signals with timestamps.",
-      "files": [
-        "frontend/src/components/dashboard/BotCard.tsx",
-        "frontend/src/hooks/useBotMetrics.ts",
-        "frontend/src/pages/Dashboard.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "http-outcalls@3.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-manual-trading-mode-that-allows-users-to-manually-execute-spot-and-futures-trades-with-custom-parameters-symbol-amount-price-for-spot-symbol-side-leverage-amount-for-futures-while-also-supporting-automated-mode-where-bots-execute-trades-based-on-their-configured-strategies-users-must-be-able-to-toggle-between-manual-and-automated-modes-for-each-bot-independently",
-      "featureTitle": "Implement manual trading mode that allows users to manually execute spot and futures trades with custom parameters (symbol, amount, price for spot; symbol, side, leverage, amount for futures), while also supporting automated mode where bots execute trades based on their configured strategies. Users must be able to toggle between manual and automated modes for each bot independently.",
-      "files": [
-        "frontend/src/components/bots/BotModeToggle.tsx",
-        "frontend/src/components/trading/ManualTradeForm.tsx",
-        "frontend/src/pages/ManualTrading.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "http-outcalls@3.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-5"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-bitunix-api-integration-module-that-securely-stores-api-key-and-secret-handles-authentication-and-provides-methods-for-fetching-market-data-price-volume-order-book-placing-orders-spot-and-futures-canceling-orders-fetching-account-balance-and-retrieving-open-positions-include-a-settings-page-where-users-can-input-and-save-their-bitunix-api-credentials",
-      "featureTitle": "Create Bitunix API integration module that securely stores API key and secret, handles authentication, and provides methods for: fetching market data (price, volume, order book), placing orders (spot and futures), canceling orders, fetching account balance, and retrieving open positions. Include a settings page where users can input and save their Bitunix API credentials.",
-      "files": [
-        "frontend/src/hooks/useApiCredentials.ts",
+        "frontend/src/hooks/useQueries.ts",
         "frontend/src/pages/Settings.tsx"
       ],
       "components": [
@@ -122,16 +18,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-6"
+        "REQ-13"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-risk-management-controls-for-all-bots-including-configurable-stop-loss-percentage-exit-position-when-loss-reaches-threshold-configurable-take-profit-percentage-exit-position-when-profit-reaches-target-maximum-position-size-limits-and-daily-loss-limits-display-risk-metrics-on-the-dashboard",
-      "featureTitle": "Implement risk management controls for all bots including: configurable stop-loss percentage (exit position when loss reaches threshold), configurable take-profit percentage (exit position when profit reaches target), maximum position size limits, and daily loss limits. Display risk metrics on the dashboard.",
+      "featureId": "feature-add-comprehensive-error-handling-for-api-credential-validation-that-catches-all-exceptions-during-the-save-operation-display-user-friendly-error-messages-in-persian-explaining-what-went-wrong-e-g-invalid-credentials-format-network-timeout-server-error-instead-of-crashing-the-application",
+      "featureTitle": "Add comprehensive error handling for API credential validation that catches all exceptions during the save operation. Display user-friendly error messages in Persian explaining what went wrong (e.g., invalid credentials format, network timeout, server error) instead of crashing the application.",
       "files": [
-        "frontend/src/components/bots/RiskManagementForm.tsx",
-        "frontend/src/components/dashboard/RiskMetricsPanel.tsx"
+        "frontend/src/pages/Settings.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -143,20 +38,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-7"
+        "REQ-14"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-integrate-internet-identity-authentication-system-so-that-users-must-authenticate-before-accessing-the-trading-dashboard-and-bot-controls-each-user-s-api-credentials-bot-configurations-and-trading-history-should-be-tied-to-their-internet-identity-principal",
-      "featureTitle": "Integrate Internet Identity authentication system so that users must authenticate before accessing the trading dashboard and bot controls. Each user's API credentials, bot configurations, and trading history should be tied to their Internet Identity principal.",
+      "featureId": "feature-implement-api-credential-validation-before-saving-to-backend-test-the-connection-to-bitunix-api-using-the-provided-credentials-and-verify-that-trading-permissions-are-enabled-before-storing-them-display-validation-status-to-users",
+      "featureTitle": "Implement API credential validation before saving to backend. Test the connection to Bitunix API using the provided credentials and verify that trading permissions are enabled before storing them. Display validation status to users.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/auth/LoginButton.tsx",
-        "frontend/src/components/auth/ProfileSetupModal.tsx",
-        "frontend/src/components/auth/ProtectedRoute.tsx",
-        "frontend/src/components/layout/Header.tsx",
-        "frontend/src/hooks/useUserProfile.ts"
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/Settings.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -168,16 +59,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-8"
+        "REQ-15"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-design-a-sophisticated-professional-trading-interface-with-a-dark-theme-optimized-for-financial-applications-use-a-color-scheme-of-deep-charcoal-backgrounds-neon-accents-cyan-for-positive-values-red-for-negative-and-crisp-white-text-include-animated-charts-gradient-cards-for-each-bot-and-smooth-transitions-for-status-changes",
-      "featureTitle": "Design a sophisticated, professional trading interface with a dark theme optimized for financial applications. Use a color scheme of deep charcoal backgrounds, neon accents (cyan for positive values, red for negative), and crisp white text. Include animated charts, gradient cards for each bot, and smooth transitions for status changes.",
+      "featureId": "feature-add-loading-states-and-proper-async-handling-throughout-the-settings-page-credential-save-flow-prevent-users-from-navigating-away-or-submitting-multiple-times-during-the-save-operation",
+      "featureTitle": "Add loading states and proper async handling throughout the Settings page credential save flow. Prevent users from navigating away or submitting multiple times during the save operation.",
       "files": [
-        "frontend/src/index.css",
-        "frontend/tailwind.config.js"
+        "frontend/src/pages/Settings.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -189,7 +79,27 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-9"
+        "REQ-16"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-success-notification-in-persian-that-displays-when-api-credentials-are-successfully-saved-and-validated-include-a-test-connection-button-that-users-can-click-to-verify-their-credentials-are-working-correctly",
+      "featureTitle": "Add a success notification in Persian that displays when API credentials are successfully saved and validated. Include a 'Test Connection' button that users can click to verify their credentials are working correctly.",
+      "files": [
+        "frontend/src/pages/Settings.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "http-outcalls@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-18"
       ],
       "confidence": "high"
     }

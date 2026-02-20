@@ -51,7 +51,7 @@ export default function Header() {
           <div className="flex items-center gap-4">
             {isAuthenticated && userProfile && (
               <span className="text-sm text-muted-foreground">
-                Welcome, <span className="text-foreground font-medium">{userProfile.name}</span>
+                Welcome, <span className="text-foreground font-medium">{userProfile.username}</span>
               </span>
             )}
             <LoginButton />

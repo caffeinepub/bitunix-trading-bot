@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { BotConfig, OrderRequest, TradeRecord, UserProfile } from '../backend';
+import type { BotConfig, BotType, OrderRequest, TradeRecord, UserProfile } from '../backend';
 
 export function useGetCallerUserProfile() {
   const { actor, isFetching: actorFetching } = useActor();
@@ -155,13 +155,35 @@ export function useSaveApiCredentials() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ apiKey, apiSecret }: { apiKey: string; apiSecret: string }) => {
+    mutationFn: async ({
+      apiKey,
+      apiSecret,
+      enabledBotTypes,
+    }: {
+      apiKey: string;
+      apiSecret: string;
+      enabledBotTypes: BotType[];
+    }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.saveApiCredentials(apiKey, apiSecret);
+      return actor.saveApiCredentials(apiKey, apiSecret, enabledBotTypes);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hasApiCredentials'] });
+      queryClient.invalidateQueries({ queryKey: ['apiBotStatus'] });
     },
+    retry: false,
+  });
+}
+
+export function useVerifyApiCredentials() {
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.verifyApiCredentials();
+    },
+    retry: false,
   });
 }
 
@@ -176,6 +198,25 @@ export function useDeleteApiCredentials() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hasApiCredentials'] });
+      queryClient.invalidateQueries({ queryKey: ['apiBotStatus'] });
     },
+  });
+}
+
+export function useGetApiBotStatus() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Array<[string, boolean]>>({
+    queryKey: ['apiBotStatus'],
+    queryFn: async () => {
+      if (!actor) return [];
+      try {
+        return actor.getApiBotStatus();
+      } catch (error) {
+        return [];
+      }
+    },
+    enabled: !!actor && !isFetching,
+    retry: false,
   });
 }

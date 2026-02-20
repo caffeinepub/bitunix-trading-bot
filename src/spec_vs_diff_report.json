@@ -1,190 +1,45 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-19T15:17:57.613Z",
-  "summary": "The implementation provides a comprehensive Bitunix trading bot system with Internet Identity authentication, bot management, and manual trading capabilities. Most core requirements are implemented including Grid, MACD+RSI, and EMA Scalping bots with configuration dialogs, risk management controls, and a dark-themed dashboard. However, several critical features are missing or incomplete, particularly around actual Bitunix API integration, real indicator calculations, automated trading execution logic, and complete dashboard metrics display.",
+  "generatedAt": "2026-02-20T21:27:34.651Z",
+  "summary": "The diff implements comprehensive error handling, validation, and user feedback for API credential management, preventing application crashes. Backend adds credential format validation with descriptive error messages, and frontend adds try-catch blocks, Persian error messages, loading states, and input validation. However, the implementation does not include actual API connection testing against Bitunix API before saving credentials.",
   "missing_requirements": [
     {
-      "id": "REQ-1",
-      "requirement": "System calculates and displays price levels for each grid",
-      "reason": "GridBotConfig component allows configuration of grid parameters but does not calculate or display the actual price levels for each grid line. The grid calculation logic is shown in summary (priceStep) but individual grid levels are not displayed.",
+      "id": "REQ-15",
+      "requirement": "Implement API credential validation before saving to backend. Test the connection to Bitunix API using the provided credentials and verify that trading permissions are enabled before storing them.",
+      "reason": "The diff includes format validation but does not implement actual API connection testing. There is no evidence of HTTP requests to Bitunix API endpoints to verify credentials or check trading permissions before storage. The Settings.tsx shows a Test Connection button, but no implementation of testing credentials against the real Bitunix API.",
       "evidence": [
-        "frontend/src/components/bots/GridBotConfig.tsx"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "requirement": "Bot calculates MACD (12, 26, 9) and RSI (14) indicators from price data",
-      "reason": "No implementation of MACD or RSI calculation algorithms found in the backend or frontend code. The configuration allows setting parameters but no actual indicator computation logic is present.",
-      "evidence": [
-        "backend/main.mo",
-        "frontend/src/components/bots/MacdRsiBotConfig.tsx"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "requirement": "Buy signals trigger when MACD crosses up and RSI < 30",
-      "reason": "No signal generation logic implemented. There is no code that evaluates MACD crossovers or RSI thresholds to generate buy signals.",
-      "evidence": [
+        "frontend/src/pages/Settings.tsx",
         "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "requirement": "Sell signals trigger when MACD crosses down and RSI > 70",
-      "reason": "No signal generation logic implemented. There is no code that evaluates MACD crossovers or RSI thresholds to generate sell signals.",
-      "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "requirement": "Bot displays current indicator values and signal status",
-      "reason": "The MacdRsiBotConfig component does not display current MACD or RSI values, only configuration parameters. No real-time indicator display is implemented.",
-      "evidence": [
-        "frontend/src/components/bots/MacdRsiBotConfig.tsx"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "Bot calculates EMA(9) and EMA(21) from price data",
-      "reason": "No EMA calculation algorithms found in backend or frontend code. The configuration sets periods but no actual exponential moving average computation is present.",
-      "evidence": [
-        "backend/main.mo",
-        "frontend/src/components/bots/EmaScalpingBotConfig.tsx"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "Buy signals trigger on upward EMA crossover",
-      "reason": "No EMA crossover detection or buy signal generation logic is implemented in the backend.",
-      "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "Sell signals trigger on downward EMA crossover",
-      "reason": "No EMA crossover detection or sell signal generation logic is implemented in the backend.",
-      "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "Bot displays current EMA values and crossover status",
-      "reason": "The EmaScalpingBotConfig component does not display current EMA values or crossover status, only configuration sliders.",
-      "evidence": [
-        "frontend/src/components/bots/EmaScalpingBotConfig.tsx"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "requirement": "Real-time update of bot status and metrics",
-      "reason": "No polling mechanism or interval-based refresh is implemented. While React Query may refetch, there's no explicit real-time update logic configured for bot metrics.",
-      "evidence": [
-        "frontend/src/hooks/useBotMetrics.ts"
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "requirement": "Create Bitunix API integration module with methods for fetching market data, placing orders, canceling orders, fetching account balance, and retrieving open positions",
-      "reason": "No actual Bitunix API integration module exists. The placeOrder function in backend/main.mo does not make real HTTP calls to Bitunix - it only stores trade records locally without external API communication.",
-      "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "requirement": "Test connection button to verify API credentials",
-      "reason": "Settings page includes API credential input but no test connection button or verification functionality is visible in the implementation.",
-      "evidence": []
-    },
-    {
-      "id": "REQ-6",
-      "requirement": "API credentials are encrypted and stored in backend",
-      "reason": "API credentials are stored but not encrypted. The saveApiCredentials function stores credentials with encryptedAt: 0 but no actual encryption logic is implemented.",
-      "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "requirement": "Bots automatically close positions when stop-loss or take-profit triggers",
-      "reason": "No automated position monitoring or closure logic is implemented. Risk management settings are configurable but no execution engine evaluates these thresholds and closes positions.",
-      "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "requirement": "Dashboard shows current risk exposure and remaining daily limits",
-      "reason": "RiskMetricsPanel shows daily P/L and loss limit usage but does not display current risk exposure per bot or maximum position size metrics as required.",
-      "evidence": [
-        "frontend/src/components/dashboard/RiskMetricsPanel.tsx"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "User profile system with name and email fields",
-      "reason": "BuildRequest does not mention user profiles, name/email collection, or ProfileSetupModal. This feature was added beyond the specified requirements.",
+      "description": "Migration module for upgrading data structures from old to new schema",
+      "reason": "The diff adds a complete migration.mo module that transforms old UserProfile and ApiCredentials types to new ones with additional fields (isValid, enabledBotTypes, createdAtNanos, username field rename). This data migration functionality was not requested in any requirement.",
       "evidence": [
-        "frontend/src/components/auth/ProfileSetupModal.tsx",
-        "backend/main.mo"
+        "backend/migration.mo"
       ]
     },
     {
-      "description": "Footer component with caffeine.ai branding",
-      "reason": "No requirement specifies a footer or external branding links. This appears to be template/boilerplate code not requested.",
+      "description": "Profile setup modal with username and email fields",
+      "reason": "The diff adds ProfileSetupModal.tsx that prompts users to create profiles with username and email. While user profiles exist in the system, the BuildRequest specifically states Must not modify the existing Internet Identity authentication system and contains no requirements for profile setup UI or username/email collection flow.",
       "evidence": [
-        "frontend/src/components/layout/Footer.tsx"
-      ]
-    },
-    {
-      "description": "Authorization mixin system with admin and user roles",
-      "reason": "BuildRequest specifies Internet Identity authentication but does not require role-based access control, admin privileges, or permission systems.",
-      "evidence": [
-        "backend/main.mo"
+        "frontend/src/components/auth/ProfileSetupModal.tsx"
       ]
     }
   ],
-  "confidence": 0.85,
+  "confidence": 0.88,
   "changed_files": [
-    "all_files_summary.json",
     "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/index.css",
-    "frontend/index.html",
-    "frontend/src/App.tsx",
-    "frontend/src/components/auth/LoginButton.tsx",
     "frontend/src/components/auth/ProfileSetupModal.tsx",
-    "frontend/src/components/auth/ProtectedRoute.tsx",
-    "frontend/src/components/bots/BotConfigDialog.tsx",
-    "frontend/src/components/bots/BotModeToggle.tsx",
-    "frontend/src/components/bots/EmaScalpingBotConfig.tsx",
-    "frontend/src/components/bots/GridBotConfig.tsx",
-    "frontend/src/components/bots/MacdRsiBotConfig.tsx",
-    "frontend/src/components/bots/RiskManagementForm.tsx",
-    "frontend/src/components/dashboard/BotCard.tsx",
-    "frontend/src/components/dashboard/RiskMetricsPanel.tsx",
-    "frontend/src/components/layout/Footer.tsx",
     "frontend/src/components/layout/Header.tsx",
-    "frontend/src/components/trading/ManualTradeForm.tsx",
-    "frontend/src/hooks/useActor.ts",
     "frontend/src/hooks/useApiCredentials.ts",
-    "frontend/src/hooks/useBotMetrics.ts",
-    "frontend/src/hooks/useInternetIdentity.ts",
     "frontend/src/hooks/useQueries.ts",
-    "frontend/src/hooks/useUserProfile.ts",
-    "frontend/src/index.css",
-    "frontend/src/main.tsx",
-    "frontend/src/pages/Dashboard.tsx",
-    "frontend/src/pages/LandingPage.tsx",
-    "frontend/src/pages/ManualTrading.tsx",
     "frontend/src/pages/Settings.tsx",
-    "frontend/src/utils/urlParams.ts",
-    "frontend/tailwind.config.js",
     "project_state.json"
   ]
 }

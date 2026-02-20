@@ -5,14 +5,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Loader2 } from 'lucide-react';
 import Footer from '../components/layout/Footer';
 
 export default function ManualTrading() {
-  const { data: balance = 0 } = useGetBalance();
-  const { data: tradingHistory = [] } = useGetTradingHistory();
+  const { data: balance, isLoading: balanceLoading, isFetched: balanceFetched } = useGetBalance();
+  const { data: tradingHistory, isLoading: historyLoading, isFetched: historyFetched } = useGetTradingHistory();
   const [activeTab, setActiveTab] = useState<'spot' | 'futures'>('spot');
 
-  const manualTrades = tradingHistory.filter((trade) => !trade.botType);
+  // Wait for both queries to complete before rendering
+  const isLoading = balanceLoading || historyLoading;
+  const isFetched = balanceFetched && historyFetched;
+
+  if (isLoading || !isFetched) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading trading interface...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const manualTrades = (tradingHistory || []).filter((trade) => !trade.botType);
 
   return (
     <div className="space-y-6 pb-12">
@@ -27,7 +43,7 @@ export default function ManualTrading() {
           <CardDescription>Your current trading balance</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-3xl font-bold text-primary">${balance.toFixed(2)} USDT</p>
+          <p className="text-3xl font-bold text-primary">${(balance || 0).toFixed(2)} USDT</p>
         </CardContent>
       </Card>
 
@@ -65,8 +81,8 @@ export default function ManualTrading() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {manualTrades.slice(-10).reverse().map((trade) => (
-                  <TableRow key={trade.tradeId}>
+                {manualTrades.slice(-10).reverse().map((trade, idx) => (
+                  <TableRow key={`${trade.tradeId}-${idx}`}>
                     <TableCell className="font-medium">{trade.symbol}</TableCell>
                     <TableCell>
                       <Badge variant={trade.side === 'buy' ? 'default' : 'destructive'}>

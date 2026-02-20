@@ -1,266 +1,99 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-19T15:17:57.616Z",
+  "generatedAt": "2026-02-20T21:27:34.655Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 9,
-    "implemented": 9,
+    "total": 6,
+    "implemented": 5,
     "items": [
       {
-        "id": "REQ-1",
-        "summary": "Create a spot trading Grid bot that allows users to configure price range (upper/lower bounds), number of grid levels, and investment amount per grid. The bot should calculate optimal buy/sell orders across the grid and display current active orders.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/bots/GridBotConfig.tsx",
-          "frontend/src/components/bots/GridBotStatus.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/bots/GridBotConfig.tsx"
-        ]
-      },
-      {
-        "id": "REQ-2",
-        "summary": "Implement a futures trading bot using MACD + RSI strategy: generate buy signal when MACD line crosses above signal line AND RSI is below 30; generate sell signal when MACD line crosses below signal line AND RSI is above 70. Allow users to configure timeframe, leverage, and position size.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/bots/MacdRsiBotConfig.tsx",
-          "frontend/src/components/bots/MacdRsiBotStatus.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/bots/MacdRsiBotConfig.tsx"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Implement a scalping futures trading bot using EMA crossover strategy: generate buy signal when EMA(9) crosses above EMA(21); generate sell signal when EMA(9) crosses below EMA(21). Include configurable tight stop-loss and take-profit percentages suitable for quick trades.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/bots/EmaScalpingBotConfig.tsx",
-          "frontend/src/components/bots/EmaScalpingBotStatus.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/bots/EmaScalpingBotConfig.tsx"
-        ]
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Create a comprehensive dashboard that displays real-time status for all three bots including: bot name and type (spot/futures), current strategy, active/inactive status, total profit/loss in USDT and percentage, number of completed trades, current open positions, and latest entry/exit signals with timestamps.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/Dashboard.tsx",
-          "frontend/src/components/dashboard/BotCard.tsx",
-          "frontend/src/hooks/useBotMetrics.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/Dashboard.tsx",
-          "frontend/src/components/dashboard/BotCard.tsx",
-          "frontend/src/hooks/useBotMetrics.ts"
-        ]
-      },
-      {
-        "id": "REQ-5",
-        "summary": "Implement manual trading mode that allows users to manually execute spot and futures trades with custom parameters (symbol, amount, price for spot; symbol, side, leverage, amount for futures), while also supporting automated mode where bots execute trades based on their configured strategies. Users must be able to toggle between manual and automated modes for each bot independently.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/trading/ManualTradeForm.tsx",
-          "frontend/src/components/bots/BotModeToggle.tsx",
-          "frontend/src/pages/ManualTrading.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/trading/ManualTradeForm.tsx",
-          "frontend/src/components/bots/BotModeToggle.tsx",
-          "frontend/src/pages/ManualTrading.tsx"
-        ]
-      },
-      {
-        "id": "REQ-6",
-        "summary": "Create Bitunix API integration module that securely stores API key and secret, handles authentication, and provides methods for: fetching market data (price, volume, order book), placing orders (spot and futures), canceling orders, fetching account balance, and retrieving open positions. Include a settings page where users can input and save their Bitunix API credentials.",
+        "id": "REQ-13",
+        "summary": "Fix the application crash that occurs when users save Bitunix API credentials in the Settings page. The error 'خطای برنامه رخ داد' (Application error occurred) appears immediately after clicking Save, followed by a black screen with 'به مشکلی پیش اومد!' (A problem occurred). Implement proper error handling and validation to prevent crashes during API credential storage.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/Settings.tsx",
-          "frontend/src/hooks/useApiCredentials.ts"
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
           "frontend/src/pages/Settings.tsx",
-          "frontend/src/hooks/useApiCredentials.ts"
+          "frontend/src/hooks/useQueries.ts"
         ]
       },
       {
-        "id": "REQ-7",
-        "summary": "Implement risk management controls for all bots including: configurable stop-loss percentage (exit position when loss reaches threshold), configurable take-profit percentage (exit position when profit reaches target), maximum position size limits, and daily loss limits. Display risk metrics on the dashboard.",
+        "id": "REQ-14",
+        "summary": "Add comprehensive error handling for API credential validation that catches all exceptions during the save operation. Display user-friendly error messages in Persian explaining what went wrong (e.g., invalid credentials format, network timeout, server error) instead of crashing the application.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/bots/RiskManagementForm.tsx",
-          "frontend/src/components/dashboard/RiskMetricsPanel.tsx"
+          "frontend/src/pages/Settings.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/bots/RiskManagementForm.tsx",
-          "frontend/src/components/dashboard/RiskMetricsPanel.tsx"
+          "frontend/src/pages/Settings.tsx"
         ]
       },
       {
-        "id": "REQ-8",
-        "summary": "Integrate Internet Identity authentication system so that users must authenticate before accessing the trading dashboard and bot controls. Each user's API credentials, bot configurations, and trading history should be tied to their Internet Identity principal.",
+        "id": "REQ-15",
+        "summary": "Implement API credential validation before saving to backend. Test the connection to Bitunix API using the provided credentials and verify that trading permissions are enabled before storing them. Display validation status to users.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/auth/LoginButton.tsx",
-          "frontend/src/components/auth/ProfileSetupModal.tsx",
-          "frontend/src/components/auth/ProtectedRoute.tsx",
-          "frontend/src/components/layout/Header.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/hooks/useUserProfile.ts"
+          "frontend/src/pages/Settings.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/auth/LoginButton.tsx",
-          "frontend/src/components/auth/ProfileSetupModal.tsx",
-          "frontend/src/components/auth/ProtectedRoute.tsx",
-          "frontend/src/components/layout/Header.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/hooks/useUserProfile.ts"
+          "frontend/src/pages/Settings.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ]
       },
       {
-        "id": "REQ-9",
-        "summary": "Design a sophisticated, professional trading interface with a dark theme optimized for financial applications. Use a color scheme of deep charcoal backgrounds, neon accents (cyan for positive values, red for negative), and crisp white text. Include animated charts, gradient cards for each bot, and smooth transitions for status changes.",
+        "id": "REQ-16",
+        "summary": "Add loading states and proper async handling throughout the Settings page credential save flow. Prevent users from navigating away or submitting multiple times during the save operation.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/tailwind.config.js",
-          "frontend/src/components/ui/AnimatedCard.tsx"
+          "frontend/src/pages/Settings.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/index.css",
-          "frontend/tailwind.config.js"
+          "frontend/src/pages/Settings.tsx"
+        ]
+      },
+      {
+        "id": "REQ-17",
+        "summary": "Review and fix the backend credential storage mechanism to ensure it properly handles API key and secret storage without throwing exceptions. Add validation to ensure credentials are properly formatted before attempting to store them.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-18",
+        "summary": "Add a success notification in Persian that displays when API credentials are successfully saved and validated. Include a 'Test Connection' button that users can click to verify their credentials are working correctly.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/Settings.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/Settings.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/authorization/MixinAuthorization.mo",
-    "backend/authorization/access-control.mo",
-    "backend/http-outcalls/outcall.mo",
     "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
-    "build-template/Dockerfile",
-    "build-template/LICENSE",
-    "build-template/README.md",
-    "build-template/deploy.sh",
-    "build-template/icp.yaml",
-    "build-template/package.json",
-    "build-template/pnpm-lock.yaml",
-    "build-template/pnpm-workspace.yaml",
-    "build-template/scripts/prune-unused-images.js",
-    "build-template/scripts/resize-images.js",
-    "build-template/src/backend/canister.yaml",
-    "build-template/src/backend/system-idl/aaaaa-aa.did",
-    "build-template/src/frontend/canister.yaml",
-    "build-template/src/frontend/components.json",
-    "build-template/src/frontend/env.json",
-    "build-template/src/frontend/eslint-rules/no-bigint-in-query-keys.js",
-    "build-template/src/frontend/eslint-rules/require-internet-identity-provider.js",
-    "build-template/src/frontend/eslint.config.js",
-    "build-template/src/frontend/package.json",
-    "build-template/src/frontend/postcss.config.js",
-    "build-template/src/frontend/src/components/ui/accordion.tsx",
-    "build-template/src/frontend/src/components/ui/alert-dialog.tsx",
-    "build-template/src/frontend/src/components/ui/alert.tsx",
-    "build-template/src/frontend/src/components/ui/aspect-ratio.tsx",
-    "build-template/src/frontend/src/components/ui/avatar.tsx",
-    "build-template/src/frontend/src/components/ui/badge.tsx",
-    "build-template/src/frontend/src/components/ui/breadcrumb.tsx",
-    "build-template/src/frontend/src/components/ui/button.tsx",
-    "build-template/src/frontend/src/components/ui/calendar.tsx",
-    "build-template/src/frontend/src/components/ui/card.tsx",
-    "build-template/src/frontend/src/components/ui/carousel.tsx",
-    "build-template/src/frontend/src/components/ui/chart.tsx",
-    "build-template/src/frontend/src/components/ui/checkbox.tsx",
-    "build-template/src/frontend/src/components/ui/collapsible.tsx",
-    "build-template/src/frontend/src/components/ui/command.tsx",
-    "build-template/src/frontend/src/components/ui/context-menu.tsx",
-    "build-template/src/frontend/src/components/ui/dialog.tsx",
-    "build-template/src/frontend/src/components/ui/drawer.tsx",
-    "build-template/src/frontend/src/components/ui/dropdown-menu.tsx",
-    "build-template/src/frontend/src/components/ui/form.tsx",
-    "build-template/src/frontend/src/components/ui/hover-card.tsx",
-    "build-template/src/frontend/src/components/ui/input-otp.tsx",
-    "build-template/src/frontend/src/components/ui/input.tsx",
-    "build-template/src/frontend/src/components/ui/label.tsx",
-    "build-template/src/frontend/src/components/ui/menubar.tsx",
-    "build-template/src/frontend/src/components/ui/navigation-menu.tsx",
-    "build-template/src/frontend/src/components/ui/pagination.tsx",
-    "build-template/src/frontend/src/components/ui/popover.tsx",
-    "build-template/src/frontend/src/components/ui/progress.tsx",
-    "build-template/src/frontend/src/components/ui/radio-group.tsx",
-    "build-template/src/frontend/src/components/ui/resizable.tsx",
-    "build-template/src/frontend/src/components/ui/scroll-area.tsx",
-    "build-template/src/frontend/src/components/ui/select.tsx",
-    "build-template/src/frontend/src/components/ui/separator.tsx",
-    "build-template/src/frontend/src/components/ui/sheet.tsx",
-    "build-template/src/frontend/src/components/ui/sidebar.tsx",
-    "build-template/src/frontend/src/components/ui/skeleton.tsx",
-    "build-template/src/frontend/src/components/ui/slider.tsx",
-    "build-template/src/frontend/src/components/ui/sonner.tsx",
-    "build-template/src/frontend/src/components/ui/switch.tsx",
-    "build-template/src/frontend/src/components/ui/table.tsx",
-    "build-template/src/frontend/src/components/ui/tabs.tsx",
-    "build-template/src/frontend/src/components/ui/textarea.tsx",
-    "build-template/src/frontend/src/components/ui/toggle-group.tsx",
-    "build-template/src/frontend/src/components/ui/toggle.tsx",
-    "build-template/src/frontend/src/components/ui/tooltip.tsx",
-    "build-template/src/frontend/src/hooks/use-mobile.tsx",
-    "build-template/src/frontend/src/lib/utils.ts",
-    "build-template/src/frontend/tsconfig.json",
-    "build-template/src/frontend/vite.config.js",
-    "build-template/tsconfig.json",
-    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/index.css",
-    "frontend/index.html",
-    "frontend/public/assets/generated/bot-icon.dim_128x128.png",
-    "frontend/public/assets/generated/grid-pattern.dim_600x400.png",
-    "frontend/public/assets/generated/trading-hero.dim_1200x400.png",
-    "frontend/src/App.tsx",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
-    "frontend/src/components/auth/LoginButton.tsx",
     "frontend/src/components/auth/ProfileSetupModal.tsx",
-    "frontend/src/components/auth/ProtectedRoute.tsx",
-    "frontend/src/components/bots/BotConfigDialog.tsx",
-    "frontend/src/components/bots/BotModeToggle.tsx",
-    "frontend/src/components/bots/EmaScalpingBotConfig.tsx",
-    "frontend/src/components/bots/GridBotConfig.tsx",
-    "frontend/src/components/bots/MacdRsiBotConfig.tsx",
-    "frontend/src/components/bots/RiskManagementForm.tsx",
-    "frontend/src/components/dashboard/BotCard.tsx",
-    "frontend/src/components/dashboard/RiskMetricsPanel.tsx",
-    "frontend/src/components/layout/Footer.tsx",
     "frontend/src/components/layout/Header.tsx",
-    "frontend/src/components/trading/ManualTradeForm.tsx",
-    "frontend/src/config.ts",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useActor.ts",
     "frontend/src/hooks/useApiCredentials.ts",
-    "frontend/src/hooks/useBotMetrics.ts",
-    "frontend/src/hooks/useInternetIdentity.ts",
     "frontend/src/hooks/useQueries.ts",
-    "frontend/src/hooks/useUserProfile.ts",
-    "frontend/src/index.css",
-    "frontend/src/main.tsx",
-    "frontend/src/pages/Dashboard.tsx",
-    "frontend/src/pages/LandingPage.tsx",
-    "frontend/src/pages/ManualTrading.tsx",
     "frontend/src/pages/Settings.tsx",
-    "frontend/src/ui-summary.json",
-    "frontend/src/utils/StorageClient.ts",
-    "frontend/src/utils/urlParams.ts",
-    "frontend/tailwind.config.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

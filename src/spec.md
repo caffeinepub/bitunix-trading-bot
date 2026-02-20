@@ -1,17 +1,15 @@
 # Specification
 
 ## Summary
-**Goal:** Build a Bitunix trading bot system with three automated strategies (Grid spot trading, MACD+RSI futures, EMA scalping futures), manual trading capabilities, risk management, and Internet Identity authentication.
+**Goal:** Fix the application crash that occurs when saving Bitunix API credentials in the Settings page.
 
 **Planned changes:**
-- Implement Grid spot trading bot with configurable price range, grid levels, and investment distribution
-- Implement MACD+RSI futures trading bot with buy signals (MACD cross up + RSI<30) and sell signals (MACD cross down + RSI>70)
-- Implement EMA crossover scalping futures bot with configurable stop-loss and take-profit
-- Create comprehensive dashboard displaying real-time status, P&L, trades, and signals for all three bots
-- Build manual trading interface for both spot and futures with independent bot enable/disable toggles
-- Integrate Bitunix API with secure credential storage, market data fetching, order execution, and account management
-- Implement risk management controls: stop-loss, take-profit, position size limits, and daily loss limits
-- Integrate Internet Identity authentication with per-user bot configurations and trading history
-- Design dark-themed professional trading interface with neon accents, animated charts, and smooth transitions
+- Implement comprehensive error handling for API credential save operations to prevent application crashes
+- Add try-catch blocks and display user-friendly Persian error messages instead of crashing
+- Validate API credentials by testing connection to Bitunix API before saving
+- Verify trading permissions are enabled during credential validation
+- Add loading states and disable save button during processing to prevent multiple submissions
+- Fix backend credential storage mechanism to handle API keys properly without throwing exceptions
+- Add success notification in Persian and a "Test Connection" button for credential verification
 
-**User-visible outcome:** Users authenticate with Internet Identity, configure their Bitunix API credentials, set up three different trading bots with custom parameters and risk controls, view real-time performance metrics on a professional dashboard, manually execute trades, and toggle between automated and manual modes for each bot independently.
+**User-visible outcome:** Users can successfully save their Bitunix API credentials without experiencing crashes or error screens. The application provides clear feedback during the save process, validates credentials before storing them, and displays helpful error messages in Persian if something goes wrong.

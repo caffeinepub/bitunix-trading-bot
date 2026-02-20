@@ -32,11 +32,10 @@ export interface EmaScalpingBotConfig {
     ema21Period: bigint;
     stopLossPercent: number;
 }
-export interface GridBotConfig {
-    investmentPerGrid: number;
-    lowerBound: number;
-    upperBound: number;
-    gridLevels: bigint;
+export interface UpdateUserProfile {
+    username: string;
+    email: string;
+    createdAtNanos: bigint;
 }
 export interface TradeRecord {
     tradeType: string;
@@ -48,10 +47,16 @@ export interface TradeRecord {
     amount: number;
     symbol: string;
 }
+export interface GridBotConfig {
+    investmentPerGrid: number;
+    lowerBound: number;
+    upperBound: number;
+    gridLevels: bigint;
+}
 export interface UserProfile {
-    name: string;
-    createdAt: bigint;
-    email?: string;
+    username: string;
+    email: string;
+    createdAtNanos: bigint;
 }
 export interface OrderRequest {
     orderType: string;
@@ -82,6 +87,7 @@ export interface backendInterface {
     getAllTradingHistory(): Promise<Array<[Principal, Array<TradeRecord>]>>;
     getAllUserBotConfigs(): Promise<Array<[Principal, Array<BotConfig>]>>;
     getAllUsers(): Promise<Array<Principal>>;
+    getApiBotStatus(): Promise<Array<[string, boolean]>>;
     getBalance(): Promise<number>;
     getBotConfigs(): Promise<Array<BotConfig>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
@@ -92,8 +98,11 @@ export interface backendInterface {
     hasApiCredentials(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     placeOrder(request: OrderRequest): Promise<string>;
-    saveApiCredentials(apiKey: string, apiSecret: string): Promise<void>;
+    refreshApiCredentialsValidation(): Promise<boolean>;
+    saveApiCredentials(apiKey: string, apiSecret: string, enabledBotTypes: Array<BotType>): Promise<void>;
     saveBotConfig(config: BotConfig): Promise<void>;
-    saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    saveCallerUserProfile(profile: UpdateUserProfile): Promise<void>;
+    updateApiBotTypes(botTypesToEnable: Array<BotType>): Promise<void>;
     updateBotConfig(index: bigint, config: BotConfig): Promise<void>;
+    verifyApiCredentials(): Promise<boolean>;
 }

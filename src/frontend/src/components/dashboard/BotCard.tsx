@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import BotModeToggle from '../bots/BotModeToggle';
 import BotConfigDialog from '../bots/BotConfigDialog';
-import { TrendingUp, TrendingDown, Activity, Settings } from 'lucide-react';
+import { TrendingUp, TrendingDown, Settings } from 'lucide-react';
 
 interface BotCardProps {
   metric: BotMetrics;
@@ -117,12 +117,14 @@ export default function BotCard({ metric, index }: BotCardProps) {
         </CardContent>
       </Card>
 
-      <BotConfigDialog
-        open={showConfig}
-        onOpenChange={setShowConfig}
-        config={metric.config}
-        index={index}
-      />
+      {showConfig && (
+        <BotConfigDialog
+          open={showConfig}
+          onOpenChange={setShowConfig}
+          config={metric.config}
+          index={index}
+        />
+      )}
     </>
   );
 }

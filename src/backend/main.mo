@@ -1,30 +1,51 @@
 import Map "mo:core/Map";
-import Principal "mo:core/Principal";
-import Array "mo:core/Array";
-import Runtime "mo:core/Runtime";
-import Text "mo:core/Text";
-import Iter "mo:core/Iter";
-import Order "mo:core/Order";
-import Float "mo:core/Float";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+import Principal "mo:core/Principal";
+import Nat "mo:core/Nat";
+import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
+import Text "mo:core/Text";
+import Nat32 "mo:core/Nat32";
+import Array "mo:core/Array";
+import Iter "mo:core/Iter";
+import Time "mo:core/Time";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
-  // Initialize the user system state
+  // State
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
-  // Types
-  public type UserProfile = {
-    name : Text;
-    email : ?Text;
-    createdAt : Int;
-  };
+  let apiCredentials = Map.empty<Principal, ApiCredentials>();
+  let userProfiles = Map.empty<Principal, UserProfile>();
+  let tradingHistory = Map.empty<Principal, [TradeRecord]>();
+  let botConfigs = Map.empty<Principal, [BotConfig]>();
 
   public type ApiCredentials = {
     apiKey : Text;
     apiSecret : Text;
-    encryptedAt : Int;
+    isValid : Bool;
+    enabledBotTypes : [BotType];
+    createdAtNanos : Int;
+  };
+
+  public type UserProfile = {
+    username : Text;
+    email : Text;
+    createdAtNanos : Int;
+  };
+
+  public type TradeRecord = {
+    tradeId : Text;
+    symbol : Text;
+    tradeType : Text;
+    side : Text;
+    amount : Float;
+    price : Float;
+    timestamp : Int;
+    botType : ?BotType;
   };
 
   public type BotType = {
@@ -74,17 +95,6 @@ actor {
     dailyLossLimit : Float;
   };
 
-  public type TradeRecord = {
-    tradeId : Text;
-    symbol : Text;
-    tradeType : Text;
-    side : Text;
-    amount : Float;
-    price : Float;
-    timestamp : Int;
-    botType : ?BotType;
-  };
-
   public type OrderRequest = {
     symbol : Text;
     amount : Float;
@@ -92,13 +102,150 @@ actor {
     orderType : Text;
   };
 
-  // State
-  let userProfiles = Map.empty<Principal, UserProfile>();
-  let apiCredentials = Map.empty<Principal, ApiCredentials>();
-  let botConfigs = Map.empty<Principal, [BotConfig]>();
-  let tradingHistory = Map.empty<Principal, [TradeRecord]>();
+  public shared ({ caller }) func saveApiCredentials(apiKey : Text, apiSecret : Text, enabledBotTypes : [BotType]) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can save API credentials");
+    };
+    validateCredentials(apiKey, apiSecret);
+    let credentials : ApiCredentials = {
+      apiKey;
+      apiSecret;
+      isValid = true;
+      enabledBotTypes;
+      createdAtNanos = Time.now();
+    };
+    apiCredentials.add(caller, credentials);
+  };
 
-  // User Profile Management
+  func validateCredentials(apiKey : Text, apiSecret : Text) {
+    if (apiKey.size() < 8 or apiKey.size() > 64) {
+      Runtime.trap("Invalid API key length. Must be between 8 and 64 characters");
+    };
+    if (apiSecret.size() < 32 or apiSecret.size() > 128) {
+      Runtime.trap("Invalid API secret length. Must be between 32 and 128 characters");
+    };
+    if (apiKey.contains(#char ' ') or apiSecret.contains(#char ' ')) {
+      Runtime.trap("API key and secret must not contain spaces");
+    };
+    if (apiKey.contains(#char '`')) {
+      Runtime.trap("API key must not contain a ` character");
+    };
+    if (apiSecret.contains(#char '`')) {
+      Runtime.trap("API secret must not contain a ` character");
+    };
+    if (apiKey.contains(#char '\\')) {
+      Runtime.trap("API key must not contain backslashes");
+    };
+    if (apiSecret.contains(#char '\\')) {
+      Runtime.trap("API secret must not contain backslashes");
+    };
+    let validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    for (char in apiKey.toArray().values()) {
+      if (not validChars.contains(#char char)) {
+        Runtime.trap("Invalid characters in API key");
+      };
+    };
+    for (char in apiSecret.toArray().values()) {
+      if (not validChars.contains(#char char)) {
+        Runtime.trap("Invalid characters in API secret");
+      };
+    };
+  };
+
+  public shared ({ caller }) func updateApiBotTypes(botTypesToEnable : [BotType]) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can update API bot types");
+    };
+    let credentialsForUser = switch (apiCredentials.get(caller)) {
+      case (null) { Runtime.trap("No saved API credentials found") };
+      case (?creds) { creds };
+    };
+    let updatedCreds : ApiCredentials = {
+      credentialsForUser with enabledBotTypes = botTypesToEnable
+    };
+    apiCredentials.add(caller, updatedCreds);
+  };
+
+  public query ({ caller }) func verifyApiCredentials() : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can verify API credentials");
+    };
+    let userCreds : ApiCredentials = switch (apiCredentials.get(caller)) {
+      case (?creds) { creds };
+      case (null) { Runtime.trap("No API credentials have been saved for this user") };
+    };
+
+    if (userCreds.isValid) {
+      return true;
+    };
+    Runtime.trap("The saved API credentials are invalid or have expired. Please update your credentials to continue trading");
+  };
+
+  public shared ({ caller }) func deleteApiCredentials() : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can delete API credentials");
+    };
+    apiCredentials.remove(caller);
+  };
+
+  public query ({ caller }) func hasApiCredentials() : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can check for API credentials");
+    };
+    switch (apiCredentials.get(caller)) {
+      case (null) { false };
+      case (?_) { true };
+    };
+  };
+
+  public query ({ caller }) func getApiBotStatus() : async [(Text, Bool)] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can check API bot status");
+    };
+    let userCreds : ApiCredentials = switch (apiCredentials.get(caller)) {
+      case (?creds) { creds };
+      case (null) { Runtime.trap("No API credentials saved for this user") };
+    };
+    let statusTuples = userCreds.enabledBotTypes.map(
+      func(botType) {
+        switch (botType) {
+          case (#grid) { ("grid", userCreds.isValid) };
+          case (#macdRsi) { ("macdRsi", userCreds.isValid) };
+          case (#emaScalping) { ("emaScalping", userCreds.isValid) };
+        };
+      }
+    );
+    if (statusTuples.size() == 0) {
+      Runtime.trap("No bots enabled for this user");
+    };
+    statusTuples;
+  };
+
+  // Routinely validate credentials after critical points.
+  // Explicit validate endpoint duplicated with this validation mechanism to support more common use cases
+
+  public shared ({ caller }) func refreshApiCredentialsValidation() : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can refresh API credentials validation");
+    };
+    switch (apiCredentials.get(caller)) {
+      case (?credentials) {
+        let validated = switch (credentials.enabledBotTypes.size()) {
+          case (0) { false };
+          case (_) { credentials.isValid };
+        };
+        validated;
+      };
+      case (null) { false };
+    };
+  };
+
+  public type UpdateUserProfile = {
+    username : Text;
+    email : Text;
+    createdAtNanos : Int;
+  };
+
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view profiles");
@@ -107,47 +254,21 @@ actor {
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
-    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+    if (caller != user and not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Can only view your own profile or admin access required");
     };
     userProfiles.get(user);
   };
 
-  public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
+  public shared ({ caller }) func saveCallerUserProfile(profile : UpdateUserProfile) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can save profiles");
     };
-    userProfiles.add(caller, profile);
-  };
-
-  // API Credentials Management
-  public shared ({ caller }) func saveApiCredentials(apiKey : Text, apiSecret : Text) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can save API credentials");
-    };
-    let credentials : ApiCredentials = {
-      apiKey = apiKey;
-      apiSecret = apiSecret;
-      encryptedAt = 0;
-    };
-    apiCredentials.add(caller, credentials);
-  };
-
-  public query ({ caller }) func hasApiCredentials() : async Bool {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can check API credentials");
-    };
-    switch (apiCredentials.get(caller)) {
-      case (null) { false };
-      case (?_) { true };
-    };
-  };
-
-  public shared ({ caller }) func deleteApiCredentials() : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can delete API credentials");
-    };
-    apiCredentials.remove(caller);
+    userProfiles.add(caller, {
+      username = profile.username;
+      email = profile.email;
+      createdAtNanos = profile.createdAtNanos;
+    });
   };
 
   // Bot Configuration Management
@@ -231,9 +352,10 @@ actor {
       Runtime.trap("Unauthorized: Only users can place orders");
     };
 
+    // Check credentials before placing the order
     switch (apiCredentials.get(caller)) {
       case (null) { Runtime.trap("API credentials not configured") };
-      case (?_) {
+      case (_) {
         let tradeRecord : TradeRecord = {
           tradeId = "ORDER_" # caller.toText();
           symbol = request.symbol;
@@ -261,12 +383,9 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can cancel orders");
     };
-
     switch (apiCredentials.get(caller)) {
       case (null) { Runtime.trap("API credentials not configured") };
-      case (?_) {
-        "Order cancelled successfully";
-      };
+      case (_) { "Order cancelled successfully" };
     };
   };
 
@@ -274,12 +393,9 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can fetch balance");
     };
-
     switch (apiCredentials.get(caller)) {
       case (null) { Runtime.trap("API credentials not configured") };
-      case (?_) {
-        0.0;
-      };
+      case (_) { 0.0 };
     };
   };
 
@@ -295,7 +411,7 @@ actor {
   };
 
   public query ({ caller }) func getUserTradingHistory(user : Principal) : async [TradeRecord] {
-    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+    if (caller != user and not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Can only view your own trading history or admin access required");
     };
     switch (tradingHistory.get(user)) {
@@ -311,7 +427,6 @@ actor {
     tradingHistory.toArray();
   };
 
-  // Admin Functions
   public query ({ caller }) func getAllUsers() : async [Principal] {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Only admins can view all users");
@@ -329,3 +444,4 @@ actor {
     tradingHistory.remove(user);
   };
 };
+

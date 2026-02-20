@@ -18,6 +18,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     }
   }, [identity, isInitializing, navigate]);
 
+  // Show loading state while authentication is being initialized
   if (isInitializing) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -26,6 +27,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
+  // Don't render children until identity is confirmed
   if (!identity) {
     return null;
   }

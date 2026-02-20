@@ -4,7 +4,37 @@ import { Progress } from '@/components/ui/progress';
 import { AlertTriangle, TrendingUp, Shield, Activity } from 'lucide-react';
 
 export default function RiskMetricsPanel() {
-  const { data: tradingHistory = [] } = useGetTradingHistory();
+  const { data: tradingHistory, isLoading, isFetched } = useGetTradingHistory();
+
+  // Wait for data to be fully loaded before calculating metrics
+  if (isLoading || !isFetched || !tradingHistory) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5 text-primary" />
+            Risk Management Overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="animate-pulse">
+              <div className="h-4 bg-muted rounded w-24 mb-2" />
+              <div className="h-8 bg-muted rounded w-32" />
+            </div>
+            <div className="animate-pulse">
+              <div className="h-4 bg-muted rounded w-24 mb-2" />
+              <div className="h-8 bg-muted rounded w-32" />
+            </div>
+            <div className="animate-pulse">
+              <div className="h-4 bg-muted rounded w-24 mb-2" />
+              <div className="h-8 bg-muted rounded w-32" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);

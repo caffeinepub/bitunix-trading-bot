@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useInternetIdentity } from '../../hooks/useInternetIdentity';
 import { useUserProfile } from '../../hooks/useUserProfile';
 import {
@@ -16,24 +16,29 @@ import { toast } from 'sonner';
 export default function ProfileSetupModal() {
   const { identity } = useInternetIdentity();
   const { userProfile, isLoading: profileLoading, isFetched, saveProfile } = useUserProfile();
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
 
   const isAuthenticated = !!identity;
+  
+  // Only show modal when:
+  // 1. User is authenticated
+  // 2. Profile data has been fetched (not just loading)
+  // 3. Profile is null (doesn't exist)
   const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) {
-      toast.error('Please enter your name');
+    if (!username.trim()) {
+      toast.error('Please enter your username');
       return;
     }
 
     try {
       await saveProfile.mutateAsync({
-        name: name.trim(),
-        email: email.trim() || undefined,
-        createdAt: BigInt(Date.now()),
+        username: username.trim(),
+        email: email.trim() || '',
+        createdAtNanos: BigInt(Date.now()),
       });
       toast.success('Profile created successfully!');
     } catch (error) {
@@ -42,8 +47,13 @@ export default function ProfileSetupModal() {
     }
   };
 
+  // Don't render the dialog at all if conditions aren't met
+  if (!showProfileSetup) {
+    return null;
+  }
+
   return (
-    <Dialog open={showProfileSetup}>
+    <Dialog open={true}>
       <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Welcome to Bitunix Trading Bot</DialogTitle>
@@ -51,12 +61,12 @@ export default function ProfileSetupModal() {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name *</Label>
+            <Label htmlFor="username">Username *</Label>
             <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your name"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username"
               required
             />
           </div>
